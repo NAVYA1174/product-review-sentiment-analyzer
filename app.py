@@ -136,13 +136,13 @@ st.markdown("""
                 🛍️ Product Review Sentiment Analyzer
             </h1>
             <p style="margin:6px 0 0 0; color:#94A3B8; font-size:14px;">
-                Comprehensive NLP Sentiment Mining, Aspect-Based Analysis (ABSA) & Competitive Product Intelligence
+                Analyze Amazon & Flipkart Reviews (Positive / Neutral / Negative) using NLP (VADER & TextBlob) & Interactive Visualizations
             </p>
         </div>
         <div>
-            <span class="badge-pill badge-project">Project 29</span>
-            <span class="badge-pill badge-ml">ML Ensemble</span>
-            <span class="badge-pill badge-absa">Aspect Mining</span>
+            <span class="badge-pill badge-project">Amazon & Flipkart Ready</span>
+            <span class="badge-pill badge-ml">NLP: VADER & TextBlob</span>
+            <span class="badge-pill badge-absa">Aspect Visualizations</span>
         </div>
     </div>
 </div>
@@ -150,7 +150,7 @@ st.markdown("""
 
 # Sidebar Configuration
 with st.sidebar:
-    st.markdown("### ⚙️ Engine Settings")
+    st.markdown("### ⚙️ NLP & Sentiment Engines")
     selected_engine = st.selectbox(
         "Sentiment Model Engine",
         options=["ensemble", "vader", "textblob", "ml"],
@@ -163,33 +163,46 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    st.markdown("### 📁 Select Benchmark Dataset")
+    st.markdown("### 🛒 E-Commerce Data Sources")
     dataset_choice = st.radio(
-        "Choose Data Source:",
-        options=["Sample Catalog (180 Reviews)", "Earbuds Audio ABSA (15 Reviews)", "Smartwatch Battle (16 Reviews)", "Upload Custom CSV"]
+        "Choose Review Dataset:",
+        options=[
+            "📦 Amazon Verified Reviews (52 Reviews)",
+            "🛍️ Flipkart Customer Reviews (50 Reviews)",
+            "🌐 Multi-Category Catalog (180 Reviews)",
+            "🎧 Earbuds Audio ABSA (15 Reviews)",
+            "⌚ Smartwatch Battle (16 Reviews)",
+            "📁 Upload Custom CSV (Amazon/Flipkart)"
+        ]
     )
 
     uploaded_file = None
-    if dataset_choice == "Upload Custom CSV":
+    if dataset_choice == "📁 Upload Custom CSV (Amazon/Flipkart)":
         uploaded_file = st.file_uploader("Upload CSV containing reviews", type=["csv"])
 
     st.markdown("---")
     st.markdown("### 💡 Quick Tips")
     st.info(
-        "- **Ensemble** mode combines rule-based NLP and ML for maximum reliability.\n"
-        "- **ABSA** maps customer sentiments directly to Battery, Sound, Quality, Comfort, & Price.\n"
-        "- Star rating is dynamically inferred from textual sentiment intensity."
+        "- **VADER & TextBlob** accurately capture e-commerce informal slang, emojis, and polarity.\n"
+        "- **Amazon & Flipkart** datasets include verified buyer flags and multi-category feedback.\n"
+        "- **ABSA** isolates Battery, Sound, Quality, Comfort, & Price dimensions automatically."
     )
 
 # Load Selected Dataset
 def get_dataset():
-    if dataset_choice == "Sample Catalog (180 Reviews)":
+    if dataset_choice == "📦 Amazon Verified Reviews (52 Reviews)":
+        p = os.path.join(BASE_DIR, "data", "amazon_reviews.csv")
+        return pd.read_csv(p) if os.path.exists(p) else pd.DataFrame()
+    elif dataset_choice == "🛍️ Flipkart Customer Reviews (50 Reviews)":
+        p = os.path.join(BASE_DIR, "data", "flipkart_reviews.csv")
+        return pd.read_csv(p) if os.path.exists(p) else pd.DataFrame()
+    elif dataset_choice == "🌐 Multi-Category Catalog (180 Reviews)":
         p = os.path.join(BASE_DIR, "data", "sample_reviews.csv")
         return pd.read_csv(p) if os.path.exists(p) else pd.DataFrame()
-    elif dataset_choice == "Earbuds Audio ABSA (15 Reviews)":
+    elif dataset_choice == "🎧 Earbuds Audio ABSA (15 Reviews)":
         p = os.path.join(BASE_DIR, "data", "earphone_reviews.csv")
         return pd.read_csv(p) if os.path.exists(p) else pd.DataFrame()
-    elif dataset_choice == "Smartwatch Battle (16 Reviews)":
+    elif dataset_choice == "⌚ Smartwatch Battle (16 Reviews)":
         p = os.path.join(BASE_DIR, "data", "smartwatch_reviews.csv")
         return pd.read_csv(p) if os.path.exists(p) else pd.DataFrame()
     elif uploaded_file is not None:
@@ -217,14 +230,14 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 # ==============================================================================
 with tab1:
     st.markdown("### 🔎 Live Sentiment & Aspect Inspector")
-    st.caption("Type or paste any product review, or click a quick sample preset to analyze instant sentiment, emotion, and aspect scores.")
+    st.caption("Analyze any Amazon or Flipkart review text in real time with VADER, TextBlob, and visual aspect breakdown.")
 
     sample_presets = {
-        "🌟 Glowingly Positive": "I have tested dozens of wireless earbuds, but these completely blow away expectations! The active noise cancellation blocks out train noise seamlessly, and the soundstage is wide with rich bass. Battery life lasted 7.5 hours.",
-        "⚡ Detailed Mixed Review": "Music reproduction is fairly crisp and balanced, but whenever I take work calls on Zoom or mobile, the person on the other end says I sound muffled. Bluetooth drops occasionally. Average overall for the price.",
-        "💔 Critical Hardware Defect": "Extremely disappointed. Out of nowhere, the left earbud refused to charge inside the case. The hinge broke on day two and customer service was slow and completely unhelpful. Horrible waste of money!",
-        "🎭 Sarcastic Contradiction": "Yeah right, supreme noise cancellation! The only noise it cancelled was my expectation. Static hiss in the background was louder than my podcasts. Sarcasm aside, truly disappointed.",
-        "🏃 Ergonomics & Comfort": "Featherlight construction and fits like a glove during high intensity running workouts. Never slips out and causes zero ear fatigue even after 4 hours of listening."
+        "📦 Amazon Verified 5★": "The 5x telephoto optical zoom on this iPhone is incredibly sharp, and the action button is super convenient. Battery easily lasts 1.5 days on heavy use. The titanium finish feels premium and lightweight.",
+        "🛍️ Flipkart Certified 5★": "Paisa vasool! Bass is thumping and battery is solid. 42 hours total playtime with case is legitimately accurate. Best earbuds under 1500 rupees. Very happy with Flipkart purchase!",
+        "⚡ Amazon Mixed 3★": "Sound quality and microphone are top-tier, but removing the folding hinge design was a huge downgrade. The carrying case takes up too much backpack space during travel.",
+        "💔 Flipkart Defect 1★": "Worst Flipkart delivery! Ordered a flagship phone but the delivery partner refused open box inspection and the screen arrived cracked. Customer service is completely unresponsive!",
+        "🎭 Sarcastic Contradiction": "Yeah right, supreme noise cancellation! The only noise it cancelled was my expectation. Static hiss in the background was louder than my podcasts. Sarcasm aside, truly disappointed."
     }
 
     cols_presets = st.columns(len(sample_presets))
